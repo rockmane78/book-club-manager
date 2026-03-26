@@ -1,9 +1,16 @@
+# Sécurité
+.env
+
 # Environnements virtuels
 venv/
-.venv/
+.env/
 env/
 ENV/
 
 # Fichiers de cache Python
 __pycache__/
 *.pyc
+
+# Fichiers de configuration IDE
+.vscode/
+.idea/
