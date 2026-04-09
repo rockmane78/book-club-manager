@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import Error
 import os
+import bcrypt #pour le hachage
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -66,41 +67,53 @@ def inscrire_utilisateur(pseudo, mot_de_passe):
     conn = create_connection()
     if conn:
         cursor = conn.cursor()
-        check_query = "SELECT id_user FROM Utilisateur WHERE pseudo = %s"
-        cursor.execute(check_query, (pseudo,))
-        
-        if cursor.fetchone():
-            conn.close()
-            return False, "Ce pseudo est deja utilise."
-        
-        insert_query = "INSERT INTO Utilisateur (pseudo, mot_de_passe) VALUES (%s, %s)"
         try:
-            cursor.execute(insert_query, (pseudo, mot_de_passe))
+            # 1. Vérifier si le pseudo existe déjà
+            cursor.execute("SELECT id_user FROM Utilisateur WHERE pseudo = %s", (pseudo,))
+            if cursor.fetchone():
+                return False, "Ce pseudo est déjà utilisé."
+
+            # 2. Hachage du mot de passe
+            salt = bcrypt.gensalt()
+            hash_mdp = bcrypt.hashpw(mot_de_passe.encode('utf-8'), salt)
+
+            # 3. Insertion du HASH (et non du mot de passe en clair)
+            query = "INSERT INTO Utilisateur (pseudo, mot_de_passe) VALUES (%s, %s)"
+            cursor.execute(query, (pseudo, hash_mdp))
             conn.commit()
-            return True, "Inscription reussie !"
+            return True, "Inscription réussie !"
         except Error as e:
-            return False, f"Erreur lors de l'inscription : {e}"
+            return False, f"Erreur SQL : {e}"
         finally:
             conn.close()
-    return False, "Connexion a la base de donnees impossible."
+    return False, "Base de données inaccessible."
 
 
 def connecter_utilisateur(pseudo, mot_de_passe):
     conn = create_connection()
     if conn:
         cursor = conn.cursor(dictionary=True)
-        query = "SELECT * FROM Utilisateur WHERE pseudo = %s AND mot_de_passe = %s"
+        # 1. On cherche l'utilisateur uniquement par son pseudo
+        query = "SELECT * FROM Utilisateur WHERE pseudo = %s"
         try:
-            cursor.execute(query, (pseudo, mot_de_passe))
+            cursor.execute(query, (pseudo,))
             user = cursor.fetchone()
+
+            # 2. Si l'utilisateur existe, on vérifie le hash
             if user:
-                return True, user 
+                hash_stocke = user['mot_de_passe']
+                # On compare le mot de passe saisi avec le hash de la base
+                if bcrypt.checkpw(mot_de_passe.encode('utf-8'), hash_stocke.encode('utf-8')):
+                    return True, user
+                else:
+                    return False, "Pseudo ou mot de passe incorrect."
             else:
                 return False, "Pseudo ou mot de passe incorrect."
         except Error as e:
-            return False, f"Erreur de base de donnees : {e}"
+            return False, f"Erreur de base de données : {e}"
         finally:
             conn.close()
+
     return False, "Connexion impossible."
 
 def ajouter_livre_avec_avis(id_proprietaire, titre, auteur, date_publication, note, commentaire):
