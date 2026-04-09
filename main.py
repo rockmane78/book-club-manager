@@ -108,38 +108,49 @@ def retour_inscription():
     creer_interface_inscription()
 
 def valider_inscription():
+    # On récupère les textes des Entry globales
     pseudo = entry_pseudo.get()
     mdp = entry_mdp.get()
-
-    if not pseudo or not mdp:
-        messagebox.showwarning("Attention", "Tous les champs doivent etre remplis")
+    
+    if pseudo == "" or mdp == "":
+        messagebox.showwarning("Erreur", "Tous les champs sont obligatoires")
         return
 
-    succes, message = database.inscrire_utilisateur(pseudo, mdp)
+    # Utilisation de la fonction inscrire_utilisateur présente dans ton database.py
+    succes, msg = database.inscrire_utilisateur(pseudo, mdp)
     
     if succes:
-        messagebox.showinfo("Succes", "Votre compte a ete cree !")
-        ouvrir_page_principale(pseudo) # <--- C'est ici qu'on change de page
+        messagebox.showinfo("Succès", msg)
+        creer_interface_connexion() # On redirige vers la connexion
     else:
-        messagebox.showerror("Erreur", message)
+        messagebox.showerror("Erreur", msg)
 
 def creer_interface_inscription():
+    for widget in root.winfo_children():
+        widget.destroy()
+        
     root.title("Inscription - BookShare")
-    root.geometry("300x250")
+    root.geometry("300x300")
     
-    global entry_pseudo, entry_mdp # On les met en global pour y acceder dans valider_inscription
+    # On définit les variables en global pour que valider_inscription les voit
+    global entry_pseudo, entry_mdp
     
-    tk.Label(root, text="Pseudo").pack(pady=5)
+    tk.Label(root, text="INSCRIPTION", font=("Arial", 12, "bold")).pack(pady=10)
+    
+    tk.Label(root, text="Pseudo").pack()
     entry_pseudo = tk.Entry(root)
     entry_pseudo.pack(pady=5)
 
-    tk.Label(root, text="Mot de passe").pack(pady=5)
+    tk.Label(root, text="Mot de passe").pack()
     entry_mdp = tk.Entry(root, show="*")
     entry_mdp.pack(pady=5)
 
-    btn_inscription = tk.Button(root, text="S'inscrire", command=valider_inscription)
-    btn_inscription.pack(pady=20)
-
+    # Note : Pas de parenthèses après valider_inscription ici
+    tk.Button(root, text="Créer mon compte", command=valider_inscription, 
+              bg="#2196F3", fg="white").pack(pady=10)
+    
+    tk.Button(root, text="Déjà inscrit ? Se connecter", borderwidth=0, 
+              fg="blue", command=creer_interface_connexion).pack()
 
 def valider_connexion():
     pseudo = entry_pseudo.get()
@@ -256,8 +267,9 @@ def ouvrir_formulaire_livre(id_user, pseudo_user):
 
         succes, msg = database.ajouter_livre_avec_avis(id_user, titre, auteur, date, note, avis)
         if succes:
-            messagebox.showinfo("Succes", msg)
-            ouvrir_page_principale(pseudo_user) # Retour a l'accueil
+            messagebox.showinfo("Succès", msg)
+            # IL FAUT PASSER id_user ICI AUSSI
+            ouvrir_page_principale(pseudo_user, id_user) 
         else:
             messagebox.showerror("Erreur", msg)
 
