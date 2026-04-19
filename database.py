@@ -68,16 +68,16 @@ def inscrire_utilisateur(pseudo, mot_de_passe):
     if conn:
         cursor = conn.cursor()
         try:
-            # 1. Vérifier si le pseudo existe déjà
+            #check si mdp existe déjà
             cursor.execute("SELECT id_user FROM Utilisateur WHERE pseudo = %s", (pseudo,))
             if cursor.fetchone():
                 return False, "Ce pseudo est déjà utilisé."
 
-            # 2. Hachage du mot de passe
+            #hach du mdp
             salt = bcrypt.gensalt()
             hash_mdp = bcrypt.hashpw(mot_de_passe.encode('utf-8'), salt)
 
-            # 3. Insertion du HASH (et non du mot de passe en clair)
+            #insertion du hach et pas du mdp en clair
             query = "INSERT INTO Utilisateur (pseudo, mot_de_passe) VALUES (%s, %s)"
             cursor.execute(query, (pseudo, hash_mdp))
             conn.commit()
