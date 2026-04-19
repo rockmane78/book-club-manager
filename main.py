@@ -8,7 +8,7 @@ def ouvrir_page_principale(pseudo, id_user):
         
     root.geometry("1200x750")
 
-    # --- HEADER -------------------------------------------------------------------------
+    # HEADER -------------------------------------------------------------------------
     header_container = tk.Frame(root, pady=10)
     header_container.pack(fill="x", padx=20)
 
@@ -47,7 +47,7 @@ def ouvrir_page_principale(pseudo, id_user):
     ent_search.pack(side="left", padx=5)
     tk.Button(search_row, text="🔍", command=lambda: afficher_resultats_recherche(ent_search.get(), pseudo, id_user)).pack(side="left")
 
-    # --- CONTENEUR DES COLONNES ------------
+    # CONTENEUR DES COLONNES ---------------------
     main_container = tk.Frame(root)
     main_container.pack(fill="both", expand=True, padx=20)
 
@@ -218,7 +218,7 @@ def ouvrir_formulaire_livre(id_user, pseudo_user):
     for widget in root.winfo_children():
         widget.destroy()
 
-    # barre de navigation haute pour le retour
+    #barre de navigation haute pour le retour
     nav_frame = tk.Frame(root)
     nav_frame.pack(fill="x", padx=10, pady=5)
     
@@ -228,7 +228,7 @@ def ouvrir_formulaire_livre(id_user, pseudo_user):
 
     tk.Label(root, text="AJOUTER UN LIVRE", font=("Helvetica", 18, "bold")).pack(pady=10)
     
-    # ... (Le reste du formulaire reste le même que précédemment)
+    #(reste du formulaire reste le même que précédemment)
 
     #Formulaire
     container = tk.Frame(root)
@@ -336,20 +336,20 @@ def ouvrir_page_emprunt(id_user, pseudo_user):
     for widget in root.winfo_children():
         widget.destroy()
     
-    # -- HEADER ----------------------------------------------------------
+    # HEADER ----------------------------------------------------------
     header = tk.Frame(root, bg="#f8f9fa", pady=10)
     header.pack(fill="x")
     tk.Button(header, text="← Retour", command=lambda: ouvrir_page_principale(pseudo_user, id_user), 
               bg="#6c757d", fg="white", relief="flat").pack(side="left", padx=20)
     tk.Label(header, text="Catalogue de prêt", font=("Helvetica", 18, "bold"), bg="#f8f9fa").pack(side="left", padx=20)
 
-    # - RECHERCHE -------------------------------------------------------------------------------------------------
+    # -RECHERCHE -------------------------------------------------------------------------------------------------
     search_frame = tk.Frame(root, pady=20)
     search_frame.pack()
     ent_search = tk.Entry(search_row := tk.Frame(search_frame), width=40, font=("Arial", 12))
     ent_search.pack(side="left", padx=5)
     
-    # ZONE DE LISTE (Tableau) ---------------------------------------------
+    #ZONE DE LISTE (Tableau) ---------------------------------------------
     table_container = tk.Frame(root, bd=1, relief="solid")
     table_container.pack(fill="both", expand=True, padx=50, pady=10)
 
